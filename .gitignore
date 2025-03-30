@@ -1,0 +1,13 @@
+.generated_files
+build
+debug
+dist
+motorbench
+nbproject/Makefile-*
+nbproject/Package-*
+nbproject/private
+_build
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+cmake
+out
