@@ -7,7 +7,6 @@ nbproject/Makefile-*
 nbproject/Package-*
 nbproject/private
 _build
-.vscode/c_cpp_properties.json
-.vscode/settings.json
+.vscode
 cmake
 out
