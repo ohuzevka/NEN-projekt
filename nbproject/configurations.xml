@@ -17,9 +17,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.c</itemPath>
-      <itemPath>src/LCD.c</itemPath>
+      <itemPath>src/main.c</itemPath>
       <itemPath>src/LCD.h</itemPath>
+      <itemPath>src/LCD.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -33,7 +33,7 @@
         <targetDevice>PIC16F917</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool></platformTool>
+        <platformTool>RealICEPlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.50</languageToolchainVersion>
         <platform>3</platform>
