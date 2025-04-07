@@ -7,6 +7,5 @@ nbproject/Makefile-*
 nbproject/Package-*
 nbproject/private
 _build
-.vscode
 cmake
 out

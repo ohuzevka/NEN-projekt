@@ -1,0 +1,17 @@
+{
+    "mplab.clangd.arguments": [
+        "--compile-commands-dir=${workspaceRoot}\\_build\\NEN-Projekt\\default"
+    ],
+    "mplab.clangd.path": "",
+    "cmake.ignoreCMakeListsMissing": true,
+    "C_Cpp.default.compilerPath": "",
+    "files.associations": {
+        "pic16f917.h": "c",
+        "stdio.h": "c",
+        "lcd.h": "c",
+        "xc.h": "c",
+        "language_support.h": "c",
+        "builtins.h": "c",
+        "pic18.h": "c"
+    }
+}

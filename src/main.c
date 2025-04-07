@@ -1,9 +1,9 @@
 
 
-// #include <xc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <pic16f917.h>
+#include <xc.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <pic16f917.h>
 
 #include "LCD.h"
 

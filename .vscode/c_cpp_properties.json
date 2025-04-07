@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "MPLABX",
+            "includePath": [
+                "${workspaceFolder}/src/**",
+                "C:/Program Files/Microchip/xc8/v2.50/pic/include/",
+                "C:/Program Files/Microchip/xc8/v2.50/pic/include/c99/"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "c:/Program Files/Microchip/xc8/v2.50/bin/xc8-cc.exe",
+            "forcedInclude": [
+                "C:/Program Files/Microchip/xc8/v2.50/pic/include/proc/pic16f917.h"
+            ]
+        }
+    ],
+    "version": 4
+}
