@@ -8,11 +8,13 @@
 #include "LCD.h"
 
 
-#define BUTTON_PIN      (PORTDbits.RD1)
+#define SW2_PIN        (PORTDbits.RD6)
+#define SW3_PIN        (PORTDbits.RD4)
+#define SW4_PIN        (PORTDbits.RD1)
+
 #define LED_PIN         (PORTDbits.RD5)
 #define MOTOR_NEG_PIN   (PORTDbits.RD2)
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
-// #define OPT_SENSOR_PIN  (PORTCbits.RC5)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
 
 void DisplayNumber(unsigned int number){
@@ -53,11 +55,12 @@ void __interrupt() isr()
 void main(void) 
 {
     // Port setup,          1 = input, 0 = output
-    TRISDbits.TRISD1 = 1;   // BUTTON_PIN setup
+    TRISDbits.TRISD6 = 1;    // SW2_PIN setup
+    TRISDbits.TRISD4 = 1;    // SW3_PIN setup
+    TRISDbits.TRISD1 = 1;   // SW4_PIN setup
     TRISDbits.TRISD5 = 0;   // LED_PIN setup
     TRISDbits.TRISD2 = 0;   // MOTOR_NEG_PIN setup
     TRISDbits.TRISD7 = 0;   // MOTOR_POS_PIN setup
-    // TRISCbits.TRISC5 = 1;   // OPT_SENSOR_PIN setup
     TRISAbits.TRISA4 = 1;   // OPT_SENSOR_PIN setup
     
 
@@ -88,15 +91,15 @@ void main(void)
     
     // TIMER2 for PWM
     T2CON = 0x05;			// fosc/4 -> 0,5us * 4 = 2us
- 	PR2 = 200;          	// 2u * 200 = 400us === PERIODE
+ 	PR2 = 100;          	// 2u * 100 = 200us === PERIODE
  	PIR1bits.TMR2IF = 0;    // iclear interrupt flag
  	PIE1bits.TMR2IE = 0;    // interrupt disable
     
     //PWM2
-    unsigned char pwm2;     // variables for duty cycle registers of PWM
+    unsigned char pwm;     // variables for duty cycle registers of PWM
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
-    pwm2 = 100;             // duty cycle to variable - must be smaller than PR2
-    CCPR2L = pwm2;          // to register of duty cycle
+    pwm = 99;             // duty cycle to variable - must be smaller than PR2
+    CCPR2L = pwm;          // to register of duty cycle
     
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
@@ -104,7 +107,14 @@ void main(void)
         
     
     while(1) {
-        if (BUTTON_PIN == 0){   // If button is pressed
+        if (SW2_PIN == 0){
+            CCPR2L = 50;
+        }
+        if (SW3_PIN == 0) {
+            CCPR2L = 99;
+        }
+        
+        if (SW4_PIN == 0) {
             MOTOR_POS_PIN = 1;  // Turn motor ON
         } else {
             MOTOR_POS_PIN = 0;  // Turn motor OFF
