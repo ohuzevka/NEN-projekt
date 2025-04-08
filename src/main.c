@@ -41,7 +41,6 @@ void __interrupt() isr()
         TMR1L = 0xB9;
         PIR1bits.TMR1IF = 0;    // clear timer0 interrupt falg
 
-        LED_PIN = !LED_PIN;
         if (interrupt_cnt++) {
             interrupt_cnt = 0;
             
