@@ -9,13 +9,14 @@
 
 
 // VARIABLES
-unsigned char cnt1, cnt2, cnt3, nmr1, nmr2, nmr3, char1, dp, s4;
+unsigned char cnt, nmr1, nmr2, nmr3;
 
 #define BUTTON_PIN      (PORTDbits.RD1)
 #define LED_PIN         (PORTDbits.RD5)
 #define MOTOR_NEG_PIN   (PORTDbits.RD2)
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
-#define OPT_SENSOR_PIN  (PORTCbits.RC5)
+// #define OPT_SENSOR_PIN  (PORTCbits.RC5)
+#define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
 
 void main(void) 
 {
@@ -28,14 +29,20 @@ void main(void)
     TRISDbits.TRISD5 = 0;   // LED_PIN setup
     TRISDbits.TRISD2 = 0;   // MOTOR_NEG_PIN setup
     TRISDbits.TRISD7 = 0;   // MOTOR_POS_PIN setup
-    TRISCbits.TRISC5 = 1;   // OPT_SENSOR_PIN setup
+    // TRISCbits.TRISC5 = 1;   // OPT_SENSOR_PIN setup
+    TRISAbits.TRISA4 = 1;   // OPT_SENSOR_PIN setup
     
 
     // TIM1 setup as counter
     // T1CON = 0x00 | _T1CON_TMR1CS_MASK | _T1CON_T1SYNC_MASK | _T1CON_TMR1ON_MASK;
-    T1CONbits.TMR1CS = 1;   // External clock from T1CKI pin 
-    T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
-    T1CONbits.TMR1ON = 1;   // Enable timer 1
+    // T1CONbits.TMR1CS = 1;   // External clock from T1CKI pin 
+    // T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
+    // T1CONbits.TMR1ON = 1;   // Enable timer 1
+
+    // TIM0 setup as counter
+    OPTION_REGbits.T0CS = 1;    // External clock from T0CKI pin
+    OPTION_REGbits.T0SE = 0;    // Increment on low-to-high transition on T0CKI pin
+    // prescaler shared with WDT
     
     // TIMER2 for PWM
     T2CON = 0x05;			// fosc/4 -> 0,5us * 4 = 2us
@@ -67,9 +74,11 @@ void main(void)
             LED_PIN = 0;        // Turn OFF LED
         }
         
-        nmr3 = TMR1L / 100;
-        nmr2 = (TMR1L % 100) / 10;
-        nmr1 = TMR1L % 10;
+        // Show number on LCD display
+        cnt = TMR0;
+        nmr3 = cnt / 100;
+        nmr2 = (cnt % 100) / 10;
+        nmr1 = cnt % 10;
         
         setNumberLcdDisplay(3, nmr3);
         setNumberLcdDisplay(2, nmr2);
