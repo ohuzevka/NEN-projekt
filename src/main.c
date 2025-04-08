@@ -20,12 +20,22 @@ unsigned char cnt1, cnt2, cnt3, nmr1, nmr2, nmr3, char1, dp, s4;
 void main(void) 
 {
     // Port setup
-    TRISD |= _TRISD_TRISD1_MASK | _TRISD_TRISD5_MASK;                           // Set TRISD pins as input
-    TRISD &= ~(_TRISD_TRISD2_MASK | _TRISD_TRISD5_MASK | _TRISD_TRISD7_MASK);   // Set TRISD pins as output
-    TRISC |= _TRISC_TRISC5_MASK;                                                // Set TRISC pins as input
+    // TRISD |= _TRISD_TRISD1_MASK;                                                 // Set TRISD pins as input
+    // TRISD &= ~(_TRISD_TRISD2_MASK | _TRISD_TRISD5_MASK | _TRISD_TRISD7_MASK);   // Set TRISD pins as output
+    // TRISC |= _TRISC_TRISC5_MASK;                                                // Set TRISC pins as input
+    // Port setup,          1 = input, 0 = output
+    TRISDbits.TRISD1 = 1;   // BUTTON_PIN setup
+    TRISDbits.TRISD5 = 0;   // LED_PIN setup
+    TRISDbits.TRISD2 = 0;   // MOTOR_NEG_PIN setup
+    TRISDbits.TRISD7 = 0;   // MOTOR_POS_PIN setup
+    TRISCbits.TRISC5 = 1;   // OPT_SENSOR_PIN setup
     
-    // TIM1 setup
-    T1CON = 0x00 | _T1CON_TMR1CS_MASK | _T1CON_T1SYNC_MASK | _T1CON_TMR1ON_MASK;
+
+    // TIM1 setup as counter
+    // T1CON = 0x00 | _T1CON_TMR1CS_MASK | _T1CON_T1SYNC_MASK | _T1CON_TMR1ON_MASK;
+    T1CONbits.TMR1CS = 1;   // External clock from T1CKI pin 
+    T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
+    T1CONbits.TMR1ON = 1;   // Enable timer 1
     
     // TIMER2 for PWM
     T2CON = 0x05;			// fosc/4 -> 0,5us * 4 = 2us
@@ -34,16 +44,15 @@ void main(void)
  	PIE1bits.TMR2IE = 0;    // interrupt disable
     
     //PWM2
-    unsigned char pwm2;   // variables for duty cycle registers of PWM
+    unsigned char pwm2;     // variables for duty cycle registers of PWM
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
     pwm2 = 100;             // duty cycle to variable - must be smaller than PR2
     CCPR2L = pwm2;          // to register of duty cycle
     
-    MOTOR_NEG_PIN = 1;  // Activate LOW side transistor to connect motor negative pin to GND
-    
+
+    MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
-    
-    
+        
     
     while(1) {
         if (BUTTON_PIN == 0){   // If button is pressed
