@@ -9,7 +9,6 @@
 
 
 // VARIABLES
-unsigned char cnt, nmr1, nmr2, nmr3;
 
 #define BUTTON_PIN      (PORTDbits.RD1)
 #define LED_PIN         (PORTDbits.RD5)
@@ -17,6 +16,20 @@ unsigned char cnt, nmr1, nmr2, nmr3;
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
 // #define OPT_SENSOR_PIN  (PORTCbits.RC5)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
+
+void DisplayNumber(unsigned int number){
+    unsigned char nmr1, nmr2, nmr3, nmr4;
+
+    nmr4 = number / 1000;
+    nmr3 = (number % 1000) / 100;
+    nmr2 = (number % 100) / 10;
+    nmr1 = number % 10;
+    
+    setNumberLcdDisplay(4, nmr4);
+    setNumberLcdDisplay(3, nmr3);
+    setNumberLcdDisplay(2, nmr2);
+    setNumberLcdDisplay(1, nmr1);
+}
 
 void main(void) 
 {
@@ -74,15 +87,7 @@ void main(void)
             LED_PIN = 0;        // Turn OFF LED
         }
         
-        // Show number on LCD display
-        cnt = TMR0;
-        nmr3 = cnt / 100;
-        nmr2 = (cnt % 100) / 10;
-        nmr1 = cnt % 10;
-        
-        setNumberLcdDisplay(3, nmr3);
-        setNumberLcdDisplay(2, nmr2);
-        setNumberLcdDisplay(1, nmr1);
+        DisplayNumber(TMR0);
     }
 }
 
