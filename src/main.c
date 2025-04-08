@@ -41,16 +41,16 @@ void main(void)
     // TIM1 setup as 1 second timer
     T1CONbits.TMR1CS = 0;   // Internal clock (F_OSC/4)
     T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
-    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:8 -> fosc/4 -> 0,5us * 8 = 4us
+    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:8 -> fosc/4 -> 1us * 8 = 8us
     T1CONbits.T1CKPS0 = 1;
     T1CONbits.T1CKPS1 = 1;
     T1CONbits.TMR1ON = 1;   // Enable timer 1
     // 262 ms
 
-    // TMR1H = 0x2F;
-    // TMR1L = 0x6C;
+    // 1_000_000 / (2*8) = 62500
+    // 65535 - 62500 = 3035 = 0x0BDB
     TMR1H = 0x0B;
-    TMR1L = 0xB9;
+    TMR1L = 0xDB;
     // Enable interuupts on overflow
     PIE1bits.TMR1IE = 1;
     INTCONbits.PEIE = 1;
@@ -69,6 +69,7 @@ void main(void)
  	PIR1bits.TMR2IF = 0;    // iclear interrupt flag
  	PIE1bits.TMR2IE = 0;    // interrupt disable
     
+
     //PWM2
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
     PWM_REG = 99;           // to register of duty cycle
@@ -108,8 +109,8 @@ void __interrupt() isr()
     if(PIR1bits.TMR1IF)         // interrupt of timer2
     {
         TMR1H = 0x0B;
-        TMR1L = 0xB9;
-        PIR1bits.TMR1IF = 0;    // clear timer0 interrupt falg
+        TMR1L = 0xDB;
+        PIR1bits.TMR1IF = 0;    // clear timer0 interrupt flag
 
         if (interrupt_cnt++) {
             interrupt_cnt = 0;
