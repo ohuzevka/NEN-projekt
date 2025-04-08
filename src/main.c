@@ -1,21 +1,16 @@
-
-
 #include <xc.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <pic16f917.h>
-
 #include "LCD.h"
 
 
-#define SW2_PIN        (PORTDbits.RD6)
-#define SW3_PIN        (PORTDbits.RD4)
-#define SW4_PIN        (PORTDbits.RD1)
-
+#define SW2_PIN         (PORTDbits.RD6)
+#define SW3_PIN         (PORTDbits.RD4)
+#define SW4_PIN         (PORTDbits.RD1)
 #define LED_PIN         (PORTDbits.RD5)
 #define MOTOR_NEG_PIN   (PORTDbits.RD2)
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
+
+#define PWM_REG CCPR2L  // Register to set PWM DC [%]     
 
 void DisplayNumber(unsigned int number){
     unsigned char nmr1, nmr2, nmr3, nmr4;
@@ -29,27 +24,6 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(3, nmr3);
     setNumberLcdDisplay(2, nmr2);
     setNumberLcdDisplay(1, nmr1);
-}
-
-
-
-// interrupt TMR1
-unsigned char interrupt_cnt = 0;
-void __interrupt() isr()
-{
-    if(PIR1bits.TMR1IF)         // interrupt of timer2
-    {
-        TMR1H = 0x0B;
-        TMR1L = 0xB9;
-        PIR1bits.TMR1IF = 0;    // clear timer0 interrupt falg
-
-        if (interrupt_cnt++) {
-            interrupt_cnt = 0;
-            
-            DisplayNumber(TMR0);
-            TMR0 = 0;
-        }
-    }
 }
 
 void main(void) 
@@ -96,10 +70,8 @@ void main(void)
  	PIE1bits.TMR2IE = 0;    // interrupt disable
     
     //PWM2
-    unsigned char pwm;     // variables for duty cycle registers of PWM
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
-    pwm = 99;             // duty cycle to variable - must be smaller than PR2
-    CCPR2L = pwm;          // to register of duty cycle
+    PWM_REG = 99;           // to register of duty cycle
     
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
@@ -108,10 +80,10 @@ void main(void)
     
     while(1) {
         if (SW2_PIN == 0){
-            CCPR2L = 50;
+            PWM_REG = 50;
         }
         if (SW3_PIN == 0) {
-            CCPR2L = 99;
+            PWM_REG = 99;
         }
         
         if (SW4_PIN == 0) {
@@ -125,8 +97,25 @@ void main(void)
         } else {
             LED_PIN = 0;        // Turn OFF LED
         }
-        
-        // DisplayNumber(TMR0);
     }
 }
 
+
+// interrupt TMR1
+unsigned char interrupt_cnt = 0;
+void __interrupt() isr()
+{
+    if(PIR1bits.TMR1IF)         // interrupt of timer2
+    {
+        TMR1H = 0x0B;
+        TMR1L = 0xB9;
+        PIR1bits.TMR1IF = 0;    // clear timer0 interrupt falg
+
+        if (interrupt_cnt++) {
+            interrupt_cnt = 0;
+            
+            DisplayNumber(TMR0);
+            TMR0 = 0;
+        }
+    }
+}
