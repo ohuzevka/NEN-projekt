@@ -8,8 +8,6 @@
 #include "LCD.h"
 
 
-// VARIABLES
-
 #define BUTTON_PIN      (PORTDbits.RD1)
 #define LED_PIN         (PORTDbits.RD5)
 #define MOTOR_NEG_PIN   (PORTDbits.RD2)
@@ -31,12 +29,28 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(1, nmr1);
 }
 
+
+
+// interrupt TMR1
+unsigned char interrupt_cnt = 0;
+void __interrupt() isr()
+{
+    if(PIR1bits.TMR1IF)         // interrupt of timer2
+    {
+        TMR1H = 0x0B;
+        TMR1L = 0xB9;
+        PIR1bits.TMR1IF = 0;    // clear timer0 interrupt falg
+
+        LED_PIN = !LED_PIN;
+        if (interrupt_cnt++) {
+            interrupt_cnt = 0;
+            LED_PIN = !LED_PIN;
+        }
+    }
+}
+
 void main(void) 
 {
-    // Port setup
-    // TRISD |= _TRISD_TRISD1_MASK;                                                 // Set TRISD pins as input
-    // TRISD &= ~(_TRISD_TRISD2_MASK | _TRISD_TRISD5_MASK | _TRISD_TRISD7_MASK);   // Set TRISD pins as output
-    // TRISC |= _TRISC_TRISC5_MASK;                                                // Set TRISC pins as input
     // Port setup,          1 = input, 0 = output
     TRISDbits.TRISD1 = 1;   // BUTTON_PIN setup
     TRISDbits.TRISD5 = 0;   // LED_PIN setup
@@ -46,11 +60,25 @@ void main(void)
     TRISAbits.TRISA4 = 1;   // OPT_SENSOR_PIN setup
     
 
-    // TIM1 setup as counter
-    // T1CON = 0x00 | _T1CON_TMR1CS_MASK | _T1CON_T1SYNC_MASK | _T1CON_TMR1ON_MASK;
-    // T1CONbits.TMR1CS = 1;   // External clock from T1CKI pin 
-    // T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
-    // T1CONbits.TMR1ON = 1;   // Enable timer 1
+    // TIM1 setup as 1 second timer
+    T1CONbits.TMR1CS = 0;   // Internal clock (F_OSC/4)
+    T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
+    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:8 -> fosc/4 -> 0,5us * 8 = 4us
+    T1CONbits.T1CKPS0 = 1;
+    T1CONbits.T1CKPS1 = 1;
+    T1CONbits.TMR1ON = 1;   // Enable timer 1
+    // 262 ms
+
+    // TMR1H = 0x2F;
+    // TMR1L = 0x6C;
+    TMR1H = 0x0B;
+    TMR1L = 0xB9;
+    // Enable interuupts on overflow
+    PIE1bits.TMR1IE = 1;
+    INTCONbits.PEIE = 1;
+    INTCONbits.GIE = 1;
+
+
 
     // TIM0 setup as counter
     OPTION_REGbits.T0CS = 1;    // External clock from T0CKI pin
@@ -81,11 +109,11 @@ void main(void)
             MOTOR_POS_PIN = 0;  // Turn motor OFF
         }
         
-        if (OPT_SENSOR_PIN){    // If optical sensor is high
-            LED_PIN = 1;        // Turn ON LED
-        } else {
-            LED_PIN = 0;        // Turn OFF LED
-        }
+        // if (OPT_SENSOR_PIN){    // If optical sensor is high
+        //     LED_PIN = 1;        // Turn ON LED
+        // } else {
+        //     LED_PIN = 0;        // Turn OFF LED
+        // }
         
         DisplayNumber(TMR0);
     }
