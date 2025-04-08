@@ -10,7 +10,9 @@
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
 
-#define PWM_REG CCPR2L  // Register to set PWM DC [%]     
+#define PWM_REG CCPR2L  // Register to set PWM DC [%]   
+
+unsigned char SW2_pressed, SW3_pressed;
 
 void DisplayNumber(unsigned int number){
     unsigned char nmr1, nmr2, nmr3, nmr4;
@@ -41,9 +43,9 @@ void main(void)
     // TIM1 setup as 1 second timer
     T1CONbits.TMR1CS = 0;   // Internal clock (F_OSC/4)
     T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
-    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:8 -> fosc/4 -> 1us * 8 = 8us
+    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:2 -> fosc/4 -> 1us * 2 = 2us
     T1CONbits.T1CKPS0 = 1;
-    T1CONbits.T1CKPS1 = 1;
+    T1CONbits.T1CKPS1 = 0;
     T1CONbits.TMR1ON = 1;   // Enable timer 1
     // 262 ms
 
@@ -72,7 +74,7 @@ void main(void)
 
     //PWM2
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
-    PWM_REG = 99;           // to register of duty cycle
+    PWM_REG = 50;           // to register of duty cycle
     
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
@@ -80,11 +82,13 @@ void main(void)
         
     
     while(1) {
-        if (SW2_PIN == 0){
-            PWM_REG = 50;
+        if (SW2_pressed){
+            SW2_pressed = 0;
+            PWM_REG -= 5;
         }
-        if (SW3_PIN == 0) {
-            PWM_REG = 99;
+        if (SW3_pressed) {
+            SW3_pressed = 0;
+            PWM_REG += 5;
         }
         
         if (SW4_PIN == 0) {
@@ -102,17 +106,28 @@ void main(void)
 }
 
 
+unsigned char SW2_last, SW3_last;
+
 // interrupt TMR1
 unsigned char interrupt_cnt = 0;
 void __interrupt() isr()
 {
-    if(PIR1bits.TMR1IF)         // interrupt of timer2
+    if(PIR1bits.TMR1IF)         // interrupt of timer1, executes every 125 ms
     {
         TMR1H = 0x0B;
         TMR1L = 0xDB;
         PIR1bits.TMR1IF = 0;    // clear timer0 interrupt flag
 
-        if (interrupt_cnt++) {
+        // Button debounce
+        SW2_last = SW2_PIN;
+        SW3_last = SW3_PIN;
+        if (SW2_last == 1 && SW2_PIN == 0)
+            SW2_pressed = 1;
+        if (SW3_last == 1 && SW3_PIN == 0)
+            SW3_pressed = 1;
+
+
+        if (interrupt_cnt >= 7) {   // divider by 8, executes every 1 s
             interrupt_cnt = 0;
             
             DisplayNumber(TMR0);
