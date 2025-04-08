@@ -44,7 +44,9 @@ void __interrupt() isr()
         LED_PIN = !LED_PIN;
         if (interrupt_cnt++) {
             interrupt_cnt = 0;
-            LED_PIN = !LED_PIN;
+            
+            DisplayNumber(TMR0);
+            TMR0 = 0;
         }
     }
 }
@@ -109,13 +111,13 @@ void main(void)
             MOTOR_POS_PIN = 0;  // Turn motor OFF
         }
         
-        // if (OPT_SENSOR_PIN){    // If optical sensor is high
-        //     LED_PIN = 1;        // Turn ON LED
-        // } else {
-        //     LED_PIN = 0;        // Turn OFF LED
-        // }
+        if (OPT_SENSOR_PIN){    // If optical sensor is high
+            LED_PIN = 1;        // Turn ON LED
+        } else {
+            LED_PIN = 0;        // Turn OFF LED
+        }
         
-        DisplayNumber(TMR0);
+        // DisplayNumber(TMR0);
     }
 }
 
