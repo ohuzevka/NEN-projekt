@@ -31,8 +31,8 @@ void DisplayNumber(unsigned int number){
 void main(void) 
 {
     // Port setup,          1 = input, 0 = output
-    TRISDbits.TRISD6 = 1;    // SW2_PIN setup
-    TRISDbits.TRISD4 = 1;    // SW3_PIN setup
+    TRISDbits.TRISD6 = 1;   // SW2_PIN setup
+    TRISDbits.TRISD4 = 1;   // SW3_PIN setup
     TRISDbits.TRISD1 = 1;   // SW4_PIN setup
     TRISDbits.TRISD5 = 0;   // LED_PIN setup
     TRISDbits.TRISD2 = 0;   // MOTOR_NEG_PIN setup
@@ -43,17 +43,17 @@ void main(void)
     // TIM1 setup as 1 second timer
     T1CONbits.TMR1CS = 0;   // Internal clock (F_OSC/4)
     T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
-    // T1CONbits.T1CKPS = 0x11;// Prescaler 1:2 -> fosc/4 -> 1us * 2 = 2us
-    T1CONbits.T1CKPS0 = 1;
+    // T1CONbits.T1CKPS = 0x01;// Prescaler 1:2 -> fosc/4 -> 1us * 2 = 2us
     T1CONbits.T1CKPS1 = 0;
+    T1CONbits.T1CKPS0 = 1;
     T1CONbits.TMR1ON = 1;   // Enable timer 1
     // 262 ms
 
-    // 1_000_000 / (2*8) = 62500
+    // 1_000_000 / (2*8) = 62500 us
     // 65535 - 62500 = 3035 = 0x0BDB
     TMR1H = 0x0B;
     TMR1L = 0xDB;
-    // Enable interuupts on overflow
+    // Enable interuupts on TIM1 overflow
     PIE1bits.TMR1IE = 1;
     INTCONbits.PEIE = 1;
     INTCONbits.GIE = 1;
@@ -66,7 +66,11 @@ void main(void)
     // prescaler shared with WDT
     
     // TIMER2 for PWM
-    T2CON = 0x05;			// fosc/4 -> 0,5us * 4 = 2us
+    // T2CON = 0x05;			// fosc/4 -> 0,5us * 4 = 2us
+    T2CONbits.T2CKPS1 = 0;  // Set prescaler to 4
+    T2CONbits.T2CKPS0 = 1;  // Set prescaler to 4
+    T2CONbits.TMR2ON = 1;   // TIM2 ON
+
  	PR2 = 100;          	// 2u * 100 = 200us === PERIODE
  	PIR1bits.TMR2IF = 0;    // iclear interrupt flag
  	PIE1bits.TMR2IE = 0;    // interrupt disable
@@ -91,17 +95,19 @@ void main(void)
             PWM_REG += 5;
         }
         
-        if (SW4_PIN == 0) {
-            MOTOR_POS_PIN = 1;  // Turn motor ON
-        } else {
-            MOTOR_POS_PIN = 0;  // Turn motor OFF
-        }
+        // if (SW4_PIN == 0) {
+        //     MOTOR_POS_PIN = 1;  // Turn motor ON
+        // } else {
+        //     MOTOR_POS_PIN = 0;  // Turn motor OFF
+        // }
+        MOTOR_NEG_PIN = !SW4_PIN;
         
-        if (OPT_SENSOR_PIN){    // If optical sensor is high
-            LED_PIN = 1;        // Turn ON LED
-        } else {
-            LED_PIN = 0;        // Turn OFF LED
-        }
+        // if (OPT_SENSOR_PIN){    // If optical sensor is high
+        //     LED_PIN = 1;        // Turn ON LED
+        // } else {
+        //     LED_PIN = 0;        // Turn OFF LED
+        // }
+        LED_PIN = OPT_SENSOR_PIN;
     }
 }
 
