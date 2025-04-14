@@ -10,7 +10,9 @@
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
 
-#define PWM_REG CCPR2L  // Register to set PWM DC [%]   
+#define PWM_REG CCPR2L  // Register to set PWM DC [%] 
+
+#define PWM_STEP 5
 
 unsigned char SW2_pressed, SW3_pressed;
 
@@ -88,11 +90,15 @@ void main(void)
     while(1) {
         if (SW2_pressed){
             SW2_pressed = 0;
-            PWM_REG -= 5;
+            if ((PWM_REG - PWM_STEP) != 0) {
+                PWM_REG -= PWM_STEP;
+            }
         }
         if (SW3_pressed) {
             SW3_pressed = 0;
-            PWM_REG += 5;
+            if ((PWM_REG + PWM_STEP) >= 100) {
+                PWM_REG += PWM_STEP;
+            }
         }
         
         // if (SW4_PIN == 0) {
