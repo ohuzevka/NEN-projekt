@@ -15,6 +15,8 @@
 #define PWM_STEP 5
 
 unsigned char SW2_pressed, SW3_pressed;
+unsigned char refresh_display_flag = 0;
+unsigned char RPS = 0;
 
 void DisplayNumber(unsigned int number){
     unsigned char nmr1, nmr2, nmr3, nmr4;
@@ -114,6 +116,8 @@ void main(void)
         //     LED_PIN = 0;        // Turn OFF LED
         // }
         LED_PIN = OPT_SENSOR_PIN;
+
+        DisplayNumber(RPS);
     }
 }
 
@@ -142,7 +146,9 @@ void __interrupt() isr()
         if (interrupt_cnt >= 7) {   // divider by 8, executes every 1 s
             interrupt_cnt = 0;
             
-            DisplayNumber(TMR0);
+            // DisplayNumber(TMR0);
+            RPS = TMR0;
+            refresh_display_flag = 1;
             TMR0 = 0;
         }
     }
