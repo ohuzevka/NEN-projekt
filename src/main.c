@@ -32,6 +32,13 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(1, nmr1);
 }
 
+void SendStrUART(char* str) {
+    for (unsigned char i = 0; str[i]; i++) {
+        while(PIR1bits.TXIF == 0);  // wait until ready for transmittion
+        TXREG = str[i];             // transmitt char
+    }
+}
+
 void main(void) 
 {
     // Port setup,          1 = input, 0 = output
@@ -43,8 +50,7 @@ void main(void)
     TRISDbits.TRISD7 = 0;   // MOTOR_POS_PIN setup
     TRISAbits.TRISA4 = 1;   // OPT_SENSOR_PIN setup
     
-
-    // TIM1 setup as 1 second timer
+    // TIM1 setup as 1 seconds timer
     T1CONbits.TMR1CS = 0;   // Internal clock (F_OSC/4)
     T1CONbits.T1SYNC = 1;   // Do not synchronize external clock input
     // T1CONbits.T1CKPS = 0x01;// Prescaler 1:2 -> fosc/4 -> 1us * 2 = 2us
@@ -63,7 +69,6 @@ void main(void)
     INTCONbits.GIE = 1;
 
 
-
     // TIM0 setup as counter
     OPTION_REGbits.T0CS = 1;    // External clock from T0CKI pin
     OPTION_REGbits.T0SE = 0;    // Increment on low-to-high transition on T0CKI pin
@@ -79,11 +84,17 @@ void main(void)
  	PIR1bits.TMR2IF = 0;    // iclear interrupt flag
  	PIE1bits.TMR2IE = 0;    // interrupt disable
     
-
     //PWM2
     CCP2CON = 0x0C;         // LSB bits 0, PWM mode
     PWM_REG = 50;           // to register of duty cycle
     
+
+    // UART init
+    TXSTAbits.TXEN = 1;     // Enable TX
+    TXSTAbits.SYNC = 0;     // Assynchnonoous operation
+    RCSTAbits.SPEN = 1;     // Enable AUSART
+
+    char TXstr[30] = "";
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
