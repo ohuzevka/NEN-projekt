@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "LCD.h"
+#include <stdio.h>
 
 
 #define SW2_PIN         (PORTDbits.RD6)
@@ -31,6 +32,7 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(2, nmr2);
     setNumberLcdDisplay(1, nmr1);
 }
+
 
 void main(void) 
 {
@@ -83,14 +85,13 @@ void main(void)
     
 
     // UART init
-    TXSTAbits.TXEN = 1;     // Enable TX
     TXSTAbits.SYNC = 0;     // Assynchnonoous operation
     RCSTAbits.SPEN = 1;     // Enable AUSART
+    TXSTAbits.TXEN = 1;     // Enable TX
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
-        
-    
+   
     while(1) {
         if (SW2_pressed){
             SW2_pressed = 0;
@@ -110,14 +111,12 @@ void main(void)
         } else {
             MOTOR_POS_PIN = 0;  // Turn motor OFF
         }
-        // MOTOR_NEG_PIN = !SW4_PIN;
         
         if (OPT_SENSOR_PIN){    // If optical sensor is high
             LED_PIN = 1;        // Turn ON LED
         } else {
             LED_PIN = 0;        // Turn OFF LED
         }
-        // LED_PIN = OPT_SENSOR_PIN;
 
         if (refresh_display_flag) {
             refresh_display_flag = 0;
