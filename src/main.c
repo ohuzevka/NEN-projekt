@@ -17,6 +17,10 @@
 #define MOTOR_POS_PIN   (PORTDbits.RD7)
 #define OPT_SENSOR_PIN  (PORTAbits.RA4) // T0CKI pin
 
+#define PWM_REG CCPR2L  // Register to set PWM DC [%] 
+#define PWM_STEP 5
+
+
 void DisplayNumber(unsigned int number){
     unsigned char nmr1, nmr2, nmr3, nmr4;
 
@@ -85,13 +89,20 @@ void main(void)
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
         
-    
+    // unsigned char SW2_last = SW2_PIN;
+    // unsigned char SW3_last = SW3_PIN;
     while(1) {
         if (SW2_PIN == 0){
-            CCPR2L = 50;
+            if ((PWM_REG - PWM_STEP) != 0) {
+                PWM_REG -= PWM_STEP;
+            }
+            while(SW2_PIN == 0);
         }
         if (SW3_PIN == 0) {
-            CCPR2L = 99;
+            if ((PWM_REG + PWM_STEP) != 0) {
+                PWM_REG += PWM_STEP;
+            }
+            while(SW3_PIN == 0);
         }
         
         if (SW4_PIN == 0) {
