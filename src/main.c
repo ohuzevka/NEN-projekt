@@ -32,13 +32,6 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(1, nmr1);
 }
 
-void SendStrUART(char* str) {
-    for (unsigned char i = 0; str[i]; i++) {
-        while(PIR1bits.TXIF == 0);  // wait until ready for transmittion
-        TXREG = str[i];             // transmitt char
-    }
-}
-
 void main(void) 
 {
     // Port setup,          1 = input, 0 = output
@@ -93,8 +86,6 @@ void main(void)
     TXSTAbits.TXEN = 1;     // Enable TX
     TXSTAbits.SYNC = 0;     // Assynchnonoous operation
     RCSTAbits.SPEN = 1;     // Enable AUSART
-
-    char TXstr[30] = "";
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
