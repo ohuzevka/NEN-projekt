@@ -117,7 +117,10 @@ void main(void)
         // }
         LED_PIN = OPT_SENSOR_PIN;
 
-        DisplayNumber(RPS);
+        if (refresh_display_flag) {
+            refresh_display_flag = 0;
+            DisplayNumber(RPS);
+        }
     }
 }
 
