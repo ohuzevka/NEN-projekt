@@ -149,6 +149,9 @@
         <property key="program-the-device-with-default-config-words" value="false"/>
         <property key="remove-unused-sections" value="true"/>
       </HI-TECH-LINK>
+      <RealICEPlatformTool>
+        <property key="firmware.download.all" value="false"/>
+      </RealICEPlatformTool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>
         <property key="stack-guidance" value="false"/>
