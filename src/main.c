@@ -33,6 +33,12 @@ void DisplayNumber(unsigned int number){
     setNumberLcdDisplay(1, nmr1);
 }
 
+void SendStrUART(char* str) {
+    for (unsigned char i = 0; str[i]; i++) {
+        while(PIR1bits.TXIF == 0);  // wait until ready for transmittion
+        TXREG = str[i];             // transmitt char
+    }
+}
 
 void main(void) 
 {
@@ -85,12 +91,17 @@ void main(void)
     
 
     // UART init
+    TXSTAbits.BRGH = 1;     // Baud rate generator high
+    SPBRG = 25;             // Baud rate = 9600
+    // SPBRG = 23;             // Baud rate = 10417 - precise
     TXSTAbits.SYNC = 0;     // Assynchnonoous operation
     RCSTAbits.SPEN = 1;     // Enable AUSART
     TXSTAbits.TXEN = 1;     // Enable TX
 
     MOTOR_NEG_PIN = 1;      // Activate LOW side transistor to connect motor negative pin to GND
     initLcdDisplay();
+
+    char TXstr[50];
    
     while(1) {
         if (SW2_pressed){
@@ -121,6 +132,10 @@ void main(void)
         if (refresh_display_flag) {
             refresh_display_flag = 0;
             DisplayNumber(RPS);
+            
+            // UART send
+            sprintf(TXstr, "RPS = %02d, RPM = %04d, PWM = %d %% \n\r", RPS, RPS * 60, PWM_REG);
+            SendStrUART(TXstr);
         }
     }
 }

@@ -152,6 +152,9 @@
       <RealICEPlatformTool>
         <property key="firmware.download.all" value="false"/>
       </RealICEPlatformTool>
+      <Tool>
+        <property key="firmware.download.all" value="false"/>
+      </Tool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>
         <property key="stack-guidance" value="false"/>
